@@ -12,7 +12,7 @@ dotenv.config()
 const PORT = 8081
 
 app.use(cors({
-    origin: ["https://xenodochial-noether-ab747d.netlify.app"],
+    origin: ["adbit.netlify.app","localhost:3000"],
     methods: ["GET", "POST"],
     credentials: true
 }));
