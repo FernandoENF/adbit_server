@@ -18,7 +18,7 @@ router.get('/links', validateToken, (req, res) => {
     const id = req.user.id
     pool.getConnection((error,db) => {
         db.query(
-            "SELECT id, uri, DATE(data) AS data FROM links WHERE idUsuario = ?; ",
+            "SELECT id, slug, DATE(data) AS data FROM links WHERE idUsuario = ?; ",
             id,
             (err, result) => {
                 if(err){
@@ -35,11 +35,11 @@ router.get('/links', validateToken, (req, res) => {
 router.post('/links/novoLink', validateToken, (req,res) => {
     const url = req.body.url
     const idUsuario = req.user.id;
-    const uri = makeid(10);
+    const slug = makeid(10);
     pool.getConnection((error,db) => {
         db.query(
-            "INSERT INTO links (url, uri, idUsuario) VALUES (?,?,?);",
-            [url,uri,idUsuario],
+            "INSERT INTO links (url, slug, idUsuario) VALUES (?,?,?);",
+            [url,slug,idUsuario],
             (err, result) => {
                 if(err){
                 console.log(err)
@@ -48,16 +48,51 @@ router.post('/links/novoLink', validateToken, (req,res) => {
         )
         db.release()
     })
-    res.json({ message: uri })
+    res.json({ message: slug })
+})
+
+router.delete('/links/delete', validateToken, (req,res) => {
+    const slug = req.slug
+    pool.getConnection((error,db) => {
+        db.query(
+            "DELETE FROM links WHERE slug = ? ;",
+            slug,
+            (err, result) => {
+                if(err){
+                console.log(err)
+                }
+            }
+        )
+        db.release()
+    })
+    res.json({ message: 'Link deletado dos seus encurtados!' })
+})
+
+router.put('/links/mudarSlug', validateToken, (req,res) => {
+    const slug = req.body.slug;
+    const newslug = req.body.newslug;
+    pool.getConnection((error,db) => {
+        db.query(
+            "UPDATE links SET slug = ? WHERE slug = ?;",
+            [newslug,slug],
+            (err, result) => {
+                if(err){
+                console.log(err)
+                }
+            }
+        )
+        db.release()
+    })
+    res.json({ message: 'Codigo encurtador atualizado!' })
 })
 
 router.post('/links/redirecionar', (req,res) => {
-    const uri = req.body.uri
-    console.log(uri)
+    const slug = req.body.slug
+    console.log(slug)
     pool.getConnection((error,db) => {
         db.query(
-            "SELECT url, uri FROM links WHERE uri = ?;",
-            uri,
+            "SELECT url, slug FROM links WHERE slug = ?;",
+            slug,
             (error, result) => {
                 if(result){
                         if(result[0] != undefined){
