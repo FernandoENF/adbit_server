@@ -52,8 +52,6 @@ function verificarLink() {
 
 }
 
-
-
 router.post('/links/novoLink', validateToken, (req, res) => {
     const url = req.body.url
     const idUsuario = req.user.id;
