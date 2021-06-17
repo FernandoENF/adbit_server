@@ -40,9 +40,9 @@ function verificarLink(slug) {
             "SELECT slug FROM links WHERE slug = ?;", slug,
             (err, result) => {
                 if (err) {
-                    res.send('Slug permitido')
+                    return true
                 } else {
-                    res.send('Slug em uso')
+                    return false
                 }
             }
         )
@@ -56,19 +56,23 @@ router.post('/links/novoLink', validateToken, (req, res) => {
     const url = req.body.url
     const idUsuario = req.user.id;
     const slug = makeid(10);
-    pool.getConnection((error, db) => {
-        db.query(
-            "INSERT INTO links (url, slug, idUsuario) VALUES (?,?,?);",
-            [url, slug, idUsuario],
-            (err, result) => {
-                if (err) {
-                    console.log(err)
+    if (verificarLink(slug) == true ){
+        pool.getConnection((error, db) => {
+            db.query(
+                "INSERT INTO links (url, slug, idUsuario) VALUES (?,?,?);",
+                [url, slug, idUsuario],
+                (err, result) => {
+                    if (err) {
+                        console.log(err)
+                    }
                 }
-            }
-        )
-        db.release()
-    })
-    res.json({ message: slug })
+                )
+                db.release()
+            })
+            res.json({ message: slug })
+        }else{
+            res.send('Não vai dar não')
+        }
 })
 
 router.delete('/links/delete', validateToken, (req, res) => {
