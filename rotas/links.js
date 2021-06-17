@@ -37,7 +37,7 @@ router.get('/links', validateToken, (req, res) => {
 function verificarLink(slug) {
     pool.getConnection((error, db) => {
         db.query(
-            "SELECT slug FROM links WHERE slug = ?;", slug
+            "SELECT slug FROM links WHERE slug = ?;", slug,
             (err, result) => {
                 if (err) {
                     res.send('Slug permitido')
